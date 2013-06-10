@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:oauth2-provider="http://www.mulesoft.org/schema/mule/oauth2-provider" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:jdbc-ee="http://www.mulesoft.org/schema/mule/ee/jdbc" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" version="EE-3.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/ee/jdbc/current/mule-jdbc-ee.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/oauth2-provider http://www.mulesoft.org/schema/mule/oauth2-provider/current/mule-oauth2-provider.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <flow name="retrieveManufacturers" doc:name="retrieveManufacturers">
+        <oauth2-provider:validate scopes="READ" config-ref="oauth2-provider" doc:name="Validate READ scope" />
+        <logger level="INFO" doc:name="Logger"/>
+        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="select" queryTimeout="-1" connector-ref="Database" doc:name="Select Manufacturers">
+            <jdbc-ee:query key="select" value="select m.id, m.name from manufacturers m"/>
+        </jdbc-ee:outbound-endpoint>
+    </flow>
+    <flow name="createManufacturer" doc:name="createManufacturer">
+        <oauth2-provider:validate scopes="WRITE" config-ref="oauth2-provider" doc:name="Validate WRITE scope" />
+        <logger level="INFO" doc:name="Logger"/>
+        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="select" queryTimeout="-1" connector-ref="Database" doc:name="Select Manufacturers">
+            <jdbc-ee:query key="select" value="insert into manufacturers (name) values (#[payload.name])"/>
+        </jdbc-ee:outbound-endpoint>
+    </flow>
+    <flow name="retrieveManufacturer" doc:name="retrieveManufacturer">
+        <oauth2-provider:validate scopes="READ" config-ref="oauth2-provider" doc:name="Validate READ scope" />
+        <logger level="INFO" doc:name="Logger"/>
+        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="select" queryTimeout="-1" connector-ref="Database" doc:name="Select Manufacturers">
+            <jdbc-ee:query key="select" value="select m.id, m.name from manufacturers m where m.id = #[manufacturer]"/>
+        </jdbc-ee:outbound-endpoint>
+        <set-payload value="#[payload[0]]" doc:name="First record"/>
+    </flow>
+    <flow name="updateManufacturer" doc:name="updateManufacturer">
+        <oauth2-provider:validate scopes="WRITE" config-ref="oauth2-provider" doc:name="Validate WRITE scope" />
+        <logger level="INFO" doc:name="Logger"/>
+        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="select" queryTimeout="-1" connector-ref="Database" doc:name="Select Manufacturers">
+            <jdbc-ee:query key="update" value="update manufacturer m set m.name = #[payload.name] where m.id = #[manufacturer]"/>
+        </jdbc-ee:outbound-endpoint>
+        <set-payload value="#[payload[0]]" doc:name="First record"/>
+    </flow>
+    <flow name="retrieveProducts" doc:name="retrieveProducts">
+        <oauth2-provider:validate scopes="READ" config-ref="oauth2-provider" doc:name="Validate READ scope" />
+        <logger level="INFO" doc:name="Logger"/>
+        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="select" queryTimeout="-1" connector-ref="Database" doc:name="Select Equipos">
+            <jdbc-ee:query key="select" value="select p.id, p.name, p.description from products p, manufacturers m where p.manufacturer_id = m.id and m.id = #[manufacturer]"/>
+        </jdbc-ee:outbound-endpoint>
+    </flow>
+    <flow name="createProduct" doc:name="createProduct">
+        <oauth2-provider:validate scopes="WRITE" config-ref="oauth2-provider" doc:name="Validate WRITE scope" />
+        <logger level="INFO" doc:name="Logger"/>
+        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="select" queryTimeout="-1" connector-ref="Database" doc:name="Select Manufacturers">
+            <jdbc-ee:query key="select" value="insert into products (name, description) values (#[payload.name], #[payload.description])"/>
+        </jdbc-ee:outbound-endpoint>
+    </flow>
+    <flow name="retrieveProduct" doc:name="retrieveProduct">
+        <oauth2-provider:validate scopes="READ" config-ref="oauth2-provider" doc:name="Validate READ scope" />
+        <logger level="INFO" doc:name="Logger"/>
+        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="select" queryTimeout="-1" connector-ref="Database" doc:name="Select Equipos">
+            <jdbc-ee:query key="select" value="select p.id, p.name from products p where p.id = #[product]"/>
+        </jdbc-ee:outbound-endpoint>
+        <set-payload value="#[payload[0]]" doc:name="First record"/>
+    </flow>
+</mule>

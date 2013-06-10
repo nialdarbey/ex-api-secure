@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="nialdarbey" created="Mon May 27 14:53:55 GMT-03:00 2013" guiVersion="3.3.2" id="1369785178097" licenseCode="CLPXDMULES37812333BY" licenseType="Commercial" modified="Mon May 27 14:53:55 GMT-03:00 2013" modifiedBy="nialdarbey" name="resultset_to_beans_grf" revision="1.0" showComponentDetails="false">
+<Global>
+<Metadata __sourcePath="{}/object" _dataStructure="OBJECT" _id="__id" _type="Output" id="a36ae85d-4343-43b0-a1c6-8f19dbb76561">
+<Record fieldDelimiter="|" name="CallHistory" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __sourcePath="{}/object/clientId" containerType="SINGLE" label="clientId" name="clientId" type="string"/>
+<Field __sourcePath="{}/object/date" containerType="SINGLE" label="date" name="date" type="date"/>
+<Field __sourcePath="{}/object/minutes" containerType="SINGLE" label="minutes" name="minutes" type="integer"/>
+<Field __sourcePath="{}/object/time" containerType="SINGLE" label="time" name="time" type="date"/>
+</Record>
+</Metadata>
+<Metadata __sourcePath="{}/resultset" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Input" id="309a655c-a738-40fe-852c-54a2a0672091">
+<Record fieldDelimiter="|" name="resultset" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __sourcePath="{}/resultset/cliente_id" containerType="SINGLE" label="cliente_id" name="cliente_id" type="string"/>
+<Field __sourcePath="{}/resultset/mins" containerType="SINGLE" label="mins" name="mins" type="integer"/>
+<Field __sourcePath="{}/resultset/date" containerType="SINGLE" label="date" name="date" type="date"/>
+<Field __sourcePath="{}/resultset/time" containerType="SINGLE" label="time" name="time" type="date"/>
+</Record>
+</Metadata>
+<Dictionary>
+<Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
+<Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="dict:inputPayload" guiHeight="0" guiName="Map&lt;k,v&gt; READER" guiWidth="0" guiX="20" guiY="20" id="BEAN_READER0" type="BEAN_READER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context outPort="0" sequenceField="__id" xpath=".">
+  <Mapping cloverField="cliente_id" trim="true" xpath="cliente_id"/>
+  <Mapping cloverField="mins" trim="true" xpath="mins"/>
+  <Mapping cloverField="date" trim="true" xpath="date"/>
+  <Mapping cloverField="time" trim="true" xpath="time"/>
+</Context>
+]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="dict:outputPayload" guiHeight="0" guiName="Pojo WRITER" guiWidth="0" guiX="900" guiY="20" id="BEAN_WRITER0" type="BEAN_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<object xmlns:clover="http://www.cloveretl.com/ns/xmlmapping" clover:inPort="0">
+  <clientId>$0.clientId</clientId>
+  <date>$0.date</date>
+  <minutes>$0.minutes</minutes>
+  <time>$0.time</time>
+</object>]]></attr>
+<attr name="_data_format"><![CDATA[JAVA]]></attr>
+<attr name="schema"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<schema-object>
+  <typed-object-ref type-ref="com.mulesoft.se.poc.telephony.CallHistory"/>
+  <typed-object type="com.mulesoft.se.poc.telephony.CallHistory">
+    <typed-object-ref name="clientId" type-ref="java.lang.String"/>
+    <typed-object-ref name="date" type-ref="java.util.Date"/>
+    <typed-object-ref name="minutes" type-ref="int"/>
+    <typed-object-ref name="time" type-ref="java.util.Date"/>
+  </typed-object>
+  <typed-object type="int"/>
+  <typed-object type="java.lang.String"/>
+  <typed-object type="java.util.Date"/>
+</schema-object>
+]]></attr>
+</Node>
+<Node enabled="enabled" guiHeight="0" guiName="Foreach 'resultset' -&gt; 'object'" guiWidth="0" guiX="460" guiY="20" id="REFORMAT0" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<attr name="melScript"><![CDATA[//MEL
+//START -> DO NOT REMOVE
+output.__id = input.__id;
+//END -> DO NOT REMOVE
+output.date = input.date;
+output.time = input.time;
+output.minutes = input.mins;
+output.clientId = input.cliente_id;]]></attr>
+</Node>
+<Edge debugMode="true" fromNode="BEAN_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="309a655c-a738-40fe-852c-54a2a0672091" outPort="Port 0 (out)" toNode="REFORMAT0:0"/>
+<Edge debugMode="true" fromNode="REFORMAT0:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="a36ae85d-4343-43b0-a1c6-8f19dbb76561" outPort="Port 0 (out)" toNode="BEAN_WRITER0:0"/>
+</Phase>
+</Graph>

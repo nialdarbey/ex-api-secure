@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:jdbc-ee="http://www.mulesoft.org/schema/mule/ee/jdbc" 
+xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm" 
+xmlns:https="http://www.mulesoft.org/schema/mule/https" xmlns:ss="http://www.springframework.org/schema/security" 
+xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security" xmlns:oauth2-provider="http://www.mulesoft.org/schema/mule/oauth2-provider" 
+xmlns:secure-property-placeholder="http://www.mulesoft.org/schema/mule/secure-property-placeholder" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.4.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/ee/jdbc/current/mule-jdbc-ee.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+http://www.mulesoft.org/schema/mule/oauth2-provider http://www.mulesoft.org/schema/mule/oauth2-provider/current/mule-oauth2-provider.xsd
+http://www.mulesoft.org/schema/mule/secure-property-placeholder http://www.mulesoft.org/schema/mule/secure-property-placeholder/current/mule-secure-property-placeholder.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd
+http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+
+	<secure-property-placeholder:config name="Secure_Property_Placeholder" key="${properties.key}" location="config.${env}.properties" doc:name="Secure Property Placeholder" />
+
+	<spring:beans>
+		<ss:authentication-manager id="inMemoryResourceOwnerAuthenticationManager" alias="inMemoryAuthManager">
+			<ss:authentication-provider>
+				<ss:user-service id="resourceOwnerUserService">
+					<ss:user name="nialdarbey" password="hello123" authorities="RESOURCE_OWNER" />
+				</ss:user-service>
+			</ss:authentication-provider>
+		</ss:authentication-manager>
+	</spring:beans>
+
+	<mule-ss:security-manager>
+		<mule-ss:delegate-security-provider name="security-provider" delegate-ref="inMemoryResourceOwnerAuthenticationManager" />
+	</mule-ss:security-manager>
+
+	<oauth2-provider:config 
+		host="localhost" 
+		port="8081" 
+		name="oauth2-provider" 
+		accessTokenEndpointPath="access-token" 
+		scopes="READ WRITE" 
+		resourceOwnerSecurityProvider-ref="security-provider" 
+		supportedGrantTypes="IMPLICIT RESOURCE_OWNER_PASSWORD_CREDENTIALS" 
+		tokenTtlSeconds="300" 
+		enableRefreshToken="true" 
+		authorizationEndpointPath="authorization-code"
+		loginPage="oauth2-provider/login.html"
+		connector-ref="httpsConnector" 
+		doc:name="OAuth provider module">
+		<oauth2-provider:clients>
+			<oauth2-provider:client clientId="partner-smartphone-app" type="PUBLIC" clientName="Smartphone App" description="Smartphone app produced by partner">
+                <oauth2-provider:redirect-uris>
+                    <oauth2-provider:redirect-uri>http://localhost*</oauth2-provider:redirect-uri>
+                </oauth2-provider:redirect-uris>
+                <oauth2-provider:authorized-grant-types>
+                    <oauth2-provider:authorized-grant-type>TOKEN</oauth2-provider:authorized-grant-type>
+                </oauth2-provider:authorized-grant-types>
+                <oauth2-provider:scopes>
+                    <oauth2-provider:scope>READ</oauth2-provider:scope>
+                </oauth2-provider:scopes>
+            </oauth2-provider:client>
+			<oauth2-provider:client clientId="customer-web-app" type="PUBLIC" clientName="Web UI" description="Javascript web UI">
+				<oauth2-provider:authorized-grant-types>
+					<oauth2-provider:authorized-grant-type>PASSWORD</oauth2-provider:authorized-grant-type>
+				</oauth2-provider:authorized-grant-types>
+				<oauth2-provider:scopes>
+					<oauth2-provider:scope>READ</oauth2-provider:scope>
+				</oauth2-provider:scopes>
+			</oauth2-provider:client>
+			<oauth2-provider:client clientId="admin-web-app" type="PUBLIC" clientName="Private Web UI" description="Javascript web UI">
+				<oauth2-provider:authorized-grant-types>
+					<oauth2-provider:authorized-grant-type>PASSWORD</oauth2-provider:authorized-grant-type>
+					<oauth2-provider:authorized-grant-type>REFRESH_TOKEN</oauth2-provider:authorized-grant-type>
+				</oauth2-provider:authorized-grant-types>
+				<oauth2-provider:scopes>
+					<oauth2-provider:scope>READ</oauth2-provider:scope>
+					<oauth2-provider:scope>WRITE</oauth2-provider:scope>
+				</oauth2-provider:scopes>
+			</oauth2-provider:client>
+		</oauth2-provider:clients>
+	</oauth2-provider:config>
+
+
+
+	<https:connector name="httpsConnector" cookieSpec="netscape" validateConnections="true" sendBufferSize="0" receiveBufferSize="0" receiveBacklog="0" clientSoTimeout="10000" serverSoTimeout="10000" socketSoLinger="0" doc:name="HTTP\HTTPS">
+		<https:tls-key-store path="src/main/resources/keystore.jks" keyPassword="mule123" storePassword="mule123" />
+	</https:connector>
+
+
+	<jdbc-ee:mysql-data-source name="MySQL_Data_Source" user="root" password="" url="jdbc:mysql://localhost:3306/test" transactionIsolation="UNSPECIFIED" doc:name="MySQL Data Source" />
+
+	<jdbc-ee:connector name="Database" dataSource-ref="MySQL_Data_Source" validateConnections="true" queryTimeout="-1" pollingFrequency="0" doc:name="Database" />
+
+</mule>

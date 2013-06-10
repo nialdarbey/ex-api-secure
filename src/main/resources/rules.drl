@@ -1,0 +1,18 @@
+package com.mulesoft.se.telephony.billing;
+
+import com.mulesoft.se.poc.telephony.CallHistory;
+import org.mule.MessageExchangePattern;
+
+global org.mule.module.bpm.MessageService mule;
+
+dialect "mvel"
+
+rule "Total tiempo para cualquier llamada que tiene duracion menos de 3 minutos"
+    lock-on-active
+when
+	$callHistory : CallHistory( minutes < 3, $date : date )
+	$other : CallHistory ( date == $date, this != $callHistory )
+	
+then
+	mule.generateMessage("vm://red-alert", $callHistory, null, MessageExchangePattern.ONE_WAY);
+end

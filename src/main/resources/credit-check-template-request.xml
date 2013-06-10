@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mes="http://www.credit-check.com/message/1.0">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <mes:CreditCheckRequest>
+         <nationalId>#[payload[0].national_id]</nationalId>
+      </mes:CreditCheckRequest>
+   </soapenv:Body>
+</soapenv:Envelope>

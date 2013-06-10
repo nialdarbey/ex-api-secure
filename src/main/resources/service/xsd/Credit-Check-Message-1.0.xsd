@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.credit-check.com/message" xmlns:tns="http://www.credit-check.com/message" elementFormDefault="unqualified">
+
+	<element name="CreditCheckRequest">
+		<complexType>
+			<sequence>
+				<element name="nationalId" type="string" />
+			</sequence>
+		</complexType>
+	</element>
+
+	<element name="CreditCheckResponse">
+		<complexType>
+			<sequence>
+				<element name="status" type="tns:statusType" />
+			</sequence>
+		</complexType>
+	</element>
+	<simpleType name="statusType">
+		<restriction base="string">
+			<enumeration value="OK" />
+			<enumeration value="RECHAZADO" />
+		</restriction>
+	</simpleType>
+</schema>

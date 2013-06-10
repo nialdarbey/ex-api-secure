@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="api-manufacturer">
+    <global-unknown wrapIn="api" wrapNSPref="" wrapNSURL="http://www.mulesoft.org/schema/mule/api-rest" description="false" unknownName="manufacturerInterface" parentIndex="0" index="1" entity-id="global-unknown#1">
+        <content>&lt;interface xmlns=&quot;http://www.mulesoft.org/schema/mule/api-rest&quot; xmlns:ee=&quot;http://www.mulesoft.org/schema/mule/ee/core&quot; name=&quot;manufacturerInterface&quot; description=&quot;Interface Spec&quot;&gt;
+		&lt;collection-resource name=&quot;manufacturers&quot; description=&quot;Manufacturers&quot;&gt;
+			&lt;retrieve flow-ref=&quot;retrieveManufacturers&quot; description=&quot;Retrieve&quot;&gt;
+				&lt;representation mediaType=&quot;application/json&quot; quality=&quot;1.0&quot;&gt;&lt;/representation&gt;
+			&lt;/retrieve&gt;
+			&lt;member idVariableName=&quot;manufacturer&quot;&gt;
+				&lt;create flow-ref=&quot;createManufacturer&quot; description=&quot;Create&quot;&gt;&lt;/create&gt;
+				&lt;retrieve flow-ref=&quot;retrieveManufacturer&quot; description=&quot;Retrieve&quot;&gt;&lt;/retrieve&gt;
+				&lt;update flow-ref=&quot;updateManufacturer&quot; description=&quot;Modify&quot;&gt;&lt;/update&gt;
+				&lt;collection-resource name=&quot;products&quot; description=&quot;Products&quot;&gt;
+					&lt;retrieve flow-ref=&quot;retrieveProducts&quot; description=&quot;Retrieve&quot;&gt;
+						&lt;representation mediaType=&quot;application/json&quot; quality=&quot;1.0&quot;&gt;&lt;/representation&gt;
+					&lt;/retrieve&gt;
+					&lt;member idVariableName=&quot;product&quot;&gt;
+						&lt;representation mediaType=&quot;application/json&quot; quality=&quot;1.0&quot;&gt;&lt;/representation&gt;
+						&lt;create flow-ref=&quot;createProduct&quot; description=&quot;Create&quot;&gt;&lt;/create&gt;
+						&lt;retrieve flow-ref=&quot;retrieveProduct&quot; description=&quot;Retrieve&quot;&gt;&lt;/retrieve&gt;
+					&lt;/member&gt;
+				&lt;/collection-resource&gt;
+			&lt;/member&gt;
+		&lt;/collection-resource&gt;
+	&lt;/interface&gt;</content>
+    </global-unknown>
+    <global-unknown wrapIn="api" wrapNSPref="" wrapNSURL="http://www.mulesoft.org/schema/mule/api-rest" description="false" unknownName="manufacturerService" parentIndex="0" index="16" entity-id="global-unknown#2">
+        <content>&lt;service xmlns=&quot;http://www.mulesoft.org/schema/mule/api-rest&quot; xmlns:ee=&quot;http://www.mulesoft.org/schema/mule/ee/core&quot; name=&quot;manufacturerService&quot; interface-ref=&quot;manufacturerInterface&quot; description=&quot;service description&quot;&gt;
+		&lt;mule:inbound-endpoint xmlns:mule=&quot;http://www.mulesoft.org/schema/mule/core&quot; address=&quot;https://localhost:8081/customer/api&quot;&gt;&lt;/mule:inbound-endpoint&gt;
+		&lt;swagger-documentation enableConsole=&quot;true&quot; consolePath=&quot;console&quot;&gt;&lt;/swagger-documentation&gt;
+	&lt;/service&gt;</content>
+    </global-unknown>
+    <description></description>
+</mule-configuration>
